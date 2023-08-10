@@ -32,5 +32,24 @@ namespace IdentityExample.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public IActionResult UserLogin()
+        {
+
+            return View();
+        }
+
+
+        [HttpPost]
+        public IActionResult UserLogin(LoginDTO loginDTO)
+        {
+
+            return View();
+        }
+
+
+
+
     }
 }
