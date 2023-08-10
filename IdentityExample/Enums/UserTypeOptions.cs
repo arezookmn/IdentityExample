@@ -1,6 +1,7 @@
 ﻿namespace IdentityExample.Enums
 {
-    public class UserTypeOptions
+    public enum UserTypeOptions
     {
+        Admin, Customer, Owner
     }
 }
