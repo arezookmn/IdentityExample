@@ -27,13 +27,38 @@ namespace IdentityExample.Controllers
         }
 
         [HttpPost]
-        public IActionResult UserRegister(RegisterDTO registerDTO)
+        public async Task<IActionResult> UserRegister(RegisterDTO registerDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Errors = ModelState.Values.SelectMany(t => t.Errors)
+                    .Select(t => t.ErrorMessage);
+                return View(registerDTO);
+            }
 
-            return View();
+            ApplicationUser user = new ApplicationUser() 
+            {
+                Email = registerDTO.Email,
+                PhoneNumber = registerDTO.PhoneNumber,
+                UserName = registerDTO.Email,
+                FullName = registerDTO.FullName,
+            };
+
+            IdentityResult result = await _userManager.CreateAsync(user, password: registerDTO.Password);
+
+            if (result.Succeeded)
+            {
+                //todo:check for roles
+                await _signInManager.SignInAsync(user, isPersistent: true);
+
+                return RedirectToAction("Index", "Home");// todo: redirect to user home , for now redirect to home
+            }
+
+
+            return RedirectToAction("Index", "Home");// todo: redirect to user home , for now redirect to home
         }
 
-        [HttpGet]
+        [HttpGet] 
         public IActionResult UserLogin()
         {
 
