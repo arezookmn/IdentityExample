@@ -53,6 +53,14 @@ namespace IdentityExample.Controllers
 
                 return RedirectToAction("Index", "Home");// todo: redirect to user home , for now redirect to home
             }
+            else
+            {
+                foreach(IdentityError error in result.Errors)
+                {
+                    ModelState.AddModelError("UserRegister", error.Description);
+                }
+                return View(registerDTO);
+            }
 
 
             return RedirectToAction("Index", "Home");// todo: redirect to user home , for now redirect to home
@@ -67,12 +75,34 @@ namespace IdentityExample.Controllers
 
 
         [HttpPost]
-        public IActionResult UserLogin(LoginDTO loginDTO)
+        public async Task<IActionResult> UserLogin(LoginDTO loginDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Errors = ModelState.Values.SelectMany(t => t.Errors)
+                    .Select(t => t.ErrorMessage);
+                return View(loginDTO);
+            }
+            //ApplicationUser user = new ApplicationUser() { UserName = loginDTO.Email};
 
-            return View();
+            var result = await _signInManager
+                .PasswordSignInAsync(loginDTO.Email, loginDTO.Password, isPersistent:true, false);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            ModelState.AddModelError("Login", "Invalid email or password");
+            return View(loginDTO);
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
 
 
 
